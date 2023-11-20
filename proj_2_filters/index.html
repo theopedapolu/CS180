@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CS 180 - Colorizing the Prokudin-Gorskii photo collection</title>
+    <style>
+        body {font-family: 'Calibri';}
+        h1 {text-align: center;}
+        h2 {text-align:left;clear:left}
+        div.gallery {border: 1px solid #ccc;}
+
+        div.gallery:hover {
+        border: 3px solid #8b8b8b;
+        }
+
+        div.gallery img {
+        width: 100%;
+        height: auto;
+        }
+
+        div.desc {
+        padding: 15px;
+        text-align: center;
+        font-family:verdana;
+        }
+
+        .container {
+        padding: 6px;
+        display: flex;
+        justify-content: center;
+        }
+
+        .responsive {
+        padding: 0 6px;
+        float: left;
+        width: 24.99999%; 
+        display:flex;
+        }
+
+        .clearfix:after {
+        content: "";
+        display: table;
+        clear: both;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>CS 180 - Fall 2023</h1>
+    <h1>Project 2: Fun with Filters and Frequencies</h1>
+    <h2 style = "text-align:center">Theophilus Pedapolu</h2>
+    <h2>Background</h2>
+    <p>In this project, we explore various use cases of filters/convolution and the frequency domain of images. Part 1 (and Part 2.1) explores various edge detection schemes using filters and Part 2 mainly uses the frequency domain of images to perform some interesting tasks</p>
+    <h2>Part 1: Filters</h2>
+    <h3>1.1 Finite Difference Operator</h3>
+    <p>First, we use the simple finite difference operators to perform edge detection on the cameraman image. In particular, we convolve the filters D_x = [-1 1] and D_y = [1 -1]<sup>T</sup> with the cameraman image to get the partial derivatives of the x and y directions, as shown below. To combine this into one edge-detected image, we perform a gradient magnitude computation as follows: res(i,j) = sqrt(cameraman_dx(i,j)<sup>2</sup> + cameraman_dy(i,j)<sup>2</sup>) where res is the output image, cameraman_dx is the convolution of the cameraman image with D_x, and cameraman_dy is the convolution with D_y. This uses the partial derivatives of the x and y directions to find the gradient magnitude for the image. As seen below, this creates a better edge detection overall that accounts for edges in all direction. Finally, to make the edge detection more clear, we binarize the gradient magnitude image by setting all pixels above 50 to 255 and pixels at or below 50 to 0. We tested out different thresholds and found 50 worked well.</p>
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/cameraman.png">
+              <img src="images/cameraman.png" alt="cameraman">
+            </a>
+            <div class="desc">Cameraman Original Image</div>
+          </div>
+        </div>
+    
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/cameraman_dx.jpg">
+              <img src="images/cameraman_dx.jpg" alt="cameraman_dx">
+            </a>
+            <div class="desc">Cameraman_dx<br>Convolved with D_x filter</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/cameraman_dy.jpg">
+                <img src="images/cameraman_dy.jpg" alt="cameraman_dy">
+              </a>
+              <div class="desc">Cameraman_dy<br>Convolved with D_y filter</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/cameraman_mag.jpg">
+                <img src="images/cameraman_mag.jpg" alt="cameraman gradient magnitude">
+              </a>
+              <div class="desc">Cameraman Gradient Magnitude</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/cameraman_bin.jpg">
+                <img src="images/cameraman_bin.jpg" alt="cameraman binarized">
+              </a>
+              <div class="desc">Cameraman Binarized</div>
+            </div> 
+        </div>
+    </div>
+    
+    <h3>1.2 Derivative of Gaussian (DoG) Filter</h3>
+    <p>With the finite difference operator, the results were a little noisy and had jagged edges, as seen in the binarized image. To get smoother edge detection, we blur the original image by convolving it with a 2D gaussian kernel, then performing the same edge detection scheme with the finite difference operators</p>
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/blurred_cameraman.jpg">
+              <img src="images/blurred_cameraman.jpg" alt="cameraman blurred">
+            </a>
+            <div class="desc">Blurred Cameraman Image</div>
+          </div>
+        </div>
+    
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/cameraman_blurred_dx.jpg">
+              <img src="images/cameraman_blurred_dx.jpg" alt="cameraman blurred dx">
+            </a>
+            <div class="desc">Blurred Cameraman_dx<br>Blurred image convolved with D_x filter</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/cameraman_blurred_dy.jpg">
+                <img src="images/cameraman_blurred_dy.jpg" alt="cameraman blurred dy">
+              </a>
+              <div class="desc">Blurred Cameraman_dy<br>Blurred image convolved with D_y filter</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/cameraman_blurred_mag.jpg">
+                <img src="images/cameraman_blurred_mag.jpg" alt="cameraman blurred gradient magnitude">
+              </a>
+              <div class="desc">Blurred Cameraman Gradient Magnitude</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/cameraman_blurred_bin.jpg">
+                <img src="images/cameraman_blurred_bin.jpg" alt="Blurred cameraman binarized">
+              </a>
+              <div class="desc">Blurred Cameraman Binarized</div>
+            </div> 
+        </div>
+    </div>
+
+    <p>As seen in the images above, there are clear differences between naively applying the finite difference filters (like in part 1.1) and blurring with a gaussian filter first then applying the finite difference filters. The edge-detected images from this part are much smoother than in the previous part, especially in the binarized images. The camerman no longer has jagged edges and instead has smooth, continous edges. Furthermore, using the properties of convolution, we can combine the blurring and derivative filters into a single filter called the Derivative of Gaussian filter (DoG) which we only need to convolve once with the cameraman image to perform smooth edge-detection. The results of applying the DoG filter are shown below; notice they are exactly the same as the images above.</p>
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/DOG_dx.jpg">
+              <img src="images/DOG_dx.jpg" alt="DoG dx">
+            </a>
+            <div class="desc">DoG_dy filter<br>Gaussian convolved with Dx filter</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/DOG_dy.jpg">
+                <img src="images/DOG_dy.jpg" alt="DoG dy">
+              </a>
+              <div class="desc">DoG_dy filter<br>Gaussian convolved with Dy filter</div>
+            </div> 
+        </div>
+    </div>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/cameraman_DOG_dx.jpg">
+              <img src="images/cameraman_DOG_dx.jpg" alt="cameraman DoG dx">
+            </a>
+            <div class="desc">DoG Cameraman_dx<br>Convolved with DoG_dx filter</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/cameraman_DOG_dy.jpg">
+                <img src="images/cameraman_DOG_dy.jpg" alt="cameraman DoG dy">
+              </a>
+              <div class="desc">DoG Cameraman_dy<br>Convolved with DoG_dy filter</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/cameraman_DOG_mag.jpg">
+                <img src="images/cameraman_DOG_mag.jpg" alt="cameraman DoG gradient magnitude">
+              </a>
+              <div class="desc">DoG Cameraman Gradient Magnitude</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/cameraman_DOG_bin.jpg">
+                <img src="images/cameraman_DOG_bin.jpg" alt="DoG cameraman binarized">
+              </a>
+              <div class="desc">DoG Cameraman Binarized</div>
+            </div> 
+        </div>
+    </div>
+
+    <h2>Part 2: Frequencies</h2>
+    <h3>2.1 Image Sharpening</h3>
+    <p>Now we try to use filters to sharpen an image, which means making the edges more "defined". To do this, we get the high frequencies of an image by applying a gaussian filter to blur the image (i.e get the low frequencies) then subtracting the blurred image from the original image. This leaves only the high frequencies (mostly edges) which we then add back to the original image to obtain a sharpened image. We also use a parameter alpha which controls how much the image is sharpened. Mathmatically, sharpened_image(i,j) = alpha*original_image(i,j) + (alpha-1)*blurred_image(i,j). Furthermore, we can combine the gaussian filter and subtraction into a single filter called the unsharp mask filter by computing alpha*e - (alpha-1)*gaussian_filter, where e is the unit impulse (a kernel with 1 in the middle and zeros elsewhere). The progression of sharpening some images is shown below.</p>
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/taj.jpg">
+              <img src="images/taj.jpg" alt="taj">
+            </a>
+            <div class="desc">Taj Mahal Original Image</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/blurred_taj.jpg">
+                <img src="images/blurred_taj.jpg" alt="Taj blurred">
+              </a>
+              <div class="desc">Blurred Taj Mahal (low frequencies)</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/hi_freq_taj.jpg">
+                <img src="images/hi_freq_taj.jpg" alt="Taj high frequencies">
+              </a>
+              <div class="desc">High frequencies Taj Mahal</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/sharpened_taj.jpg">
+                <img src="images/sharpened_taj.jpg" alt="Sharpened Taj">
+              </a>
+              <div class="desc">Sharpened Taj Mahal (alpha = 3)</div>
+            </div> 
+        </div>
+    </div>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/angel.jpg">
+              <img src="images/angel.jpg" alt="angel">
+            </a>
+            <div class="desc">Angel (my dog) Original Image</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/blurred_angel.jpg">
+                <img src="images/blurred_angel.jpg" alt="Angel blurred">
+              </a>
+              <div class="desc">Blurred Angel (low frequencies)</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/hi_freq_angel.jpg">
+                <img src="images/hi_freq_angel.jpg" alt="Angel high frequencies">
+              </a>
+              <div class="desc">High frequencies Angel</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/sharpened_angel.jpg">
+                <img src="images/sharpened_angel.jpg" alt="Sharpened Angel">
+              </a>
+              <div class="desc">Sharpened Angel (alpha = 3)</div>
+            </div> 
+        </div>
+    </div>
+
+    <p>For evalution purposes, we also blurred an image and tried to sharpen it again. The results are shown below: </p>
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/lion.jpg">
+              <img src="images/lion.jpg" alt="lion">
+            </a>
+            <div class="desc">Lion Original Image</div>
+          </div> 
+        </div>
+    </div>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/blurred_lion.jpg">
+              <img src="images/blurred_lion.jpg" alt="blurred lion">
+            </a>
+            <div class="desc">Blurred Lion</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/double_blurred_lion.jpg">
+                <img src="images/double_blurred_lion.jpg" alt="Lion double blurred">
+              </a>
+              <div class="desc">Lion Double Blurred (low frequencies)</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/hi_freq_lion.jpg">
+                <img src="images/hi_freq_lion.jpg" alt="Lion high frequencies">
+              </a>
+              <div class="desc">High frequencies Blurred Lion</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/sharpened_lion.jpg">
+                <img src="images/sharpened_lion.jpg" alt="Sharpened Lion">
+              </a>
+              <div class="desc">Sharpened Lion (alpha = 3)</div>
+            </div> 
+        </div>
+    </div>
+
+    <p>Notice that the sharpened version of the blurred image is a little better but still far from the original image. This is because the image is sharpened along the edges but the rest of the blurry areas remain blurry so we cannot get back the original image</p>
+
+    <h3>2.2 Hybrid Images</h3>
+    <p>To create hybrid images, we combined the low frequencies from one image with the high frequencies from another. In particular, to compute the low frequecies for image A, we convolved image A with a gaussian kernel to blur it. To compute the high frequecies for image B, we computed the low frequecies using a gaussian kernel and subtracted it from the original image. Then we averaged the low frequency image A with the high frequency image B to get the hybrid image. We had to experiment with the kernel sizes and the sigmas (cutoff frequencies) for each gaussian filter to get the most aesthetically pleasing result</p>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/DerekPicture.jpg">
+              <img src="images/DerekPicture.jpg" alt="blurred lion">
+            </a>
+            <div class="desc">Derek Picture</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/nutmeg.jpg">
+                <img src="images/nutmeg.jpg" alt="Lion double blurred">
+              </a>
+              <div class="desc">Nutmeg</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/dutmeg.jpg">
+                <img src="images/dutmeg.jpg" alt="Lion high frequencies">
+              </a>
+              <div class="desc">Dutmeg (Derek + Nutmeg)</div>
+            </div> 
+        </div>
+    </div>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/zebra.jpg">
+              <img src="images/zebra.jpg" alt="blurred lion">
+            </a>
+            <div class="desc">Zebra</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/cow.jpg">
+                <img src="images/cow.jpg" alt="Lion double blurred">
+              </a>
+              <div class="desc">Cow</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/hybrid_cowra.jpg">
+                <img src="images/hybrid_cowra.jpg" alt="Lion high frequencies">
+              </a>
+              <div class="desc">Cowra (Zebra + Cow)</div>
+            </div> 
+        </div>
+    </div>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/lawrence.jpg">
+              <img src="images/lawrence.jpg" alt="blurred lion">
+            </a>
+            <div class="desc">Trevor Lawrence</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/tiger.jpg">
+                <img src="images/tiger.jpg" alt="Lion double blurred">
+              </a>
+              <div class="desc">Tiger</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/hybrid_tigrence.jpg">
+                <img src="images/hybrid_tigrence.jpg" alt="Lion high frequencies">
+              </a>
+              <div class="desc">Tigrence (Trevor Lawrence + Tiger)</div>
+            </div> 
+        </div>
+    </div>
+
+    <p>Here are the FFT plots for the Tigrence hybrid image</p>
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/ff_tiger.jpg">
+              <img src="images/fft_tiger.jpg" alt="blurred lion">
+            </a>
+            <div class="desc">FFT Tiger</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/fft_lawrence.jpg">
+                <img src="images/fft_lawrence.jpg" alt="Lion double blurred">
+              </a>
+              <div class="desc">FFT Lawrence</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/fft_low.jpg">
+                <img src="images/fft_low.jpg" alt="Lion high frequencies">
+              </a>
+              <div class="desc">FFT Lawrence low pass filter</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/fft_high.jpg">
+                <img src="images/fft_high.jpg" alt="Lion high frequencies">
+              </a>
+              <div class="desc">FFT Tiger high pass filter</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/fft_tigrence.jpg">
+                <img src="images/fft_tigrence.jpg" alt="Lion high frequencies">
+              </a>
+              <div class="desc">FFT Tigrence Hybrid</div>
+            </div> 
+        </div>
+    </div>
+
+    <p>Here is an example of a failed hybrid image, a school bus and a giraffe. The school bus is too short for the giraffe so the output looks strange</p>
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/bus.jpg">
+              <img src="images/bus.jpg" alt="blurred lion">
+            </a>
+            <div class="desc">School Bus</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/giraffe.jpg">
+                <img src="images/giraffe.jpg" alt="Lion double blurred">
+              </a>
+              <div class="desc">Giraffe</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/hybrid_biraffe.jpg">
+                <img src="images/hybrid_biraffe.jpg" alt="Lion high frequencies">
+              </a>
+              <div class="desc">Biraffe (Bus + Giraffe)</div>
+            </div> 
+        </div>
+    </div>
+
+    <h3>2.3 Gaussian and Laplacian Stacks</h3>
+    <p>We used Gaussian and Laplacian Stacks to blend an apple and an orange image. In our procedure, we first created the gaussian stacks for the apple and the orange by successively blurring the images with gaussian filters that doubled in sigma at each level. We had 6 levels overall. Then, to create the laplacian stacks for these images, we subtracted consecutive levels of the gaussian stacks (i.e. gaussian_stack[i] - gaussian_stack[i+1]). Furthermore, we made the gaussian stack for the mask as well. Finally, to blend the image, we created a laplacian stack for the output via the formula laplacian_output(i,j) = gaussian_mask(i,j)*laplacian_apple(i,j) + (1-gaussian_mask(i,j))*laplacian_orange(i,j) at each level. That is, we weight the laplacians of both images by the gaussian of the mask at each level. To get the output image, we collapse the output laplacian stack by summing across all the levels. The result is a smoothly blended oraple</p>
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/apple.jpeg">
+              <img src="images/apple.jpeg" alt="blurred lion">
+            </a>
+            <div class="desc">Apple</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/orange.jpeg">
+                <img src="images/orange.jpeg" alt="Lion double blurred">
+              </a>
+              <div class="desc">Orange</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/oraple_mask.jpg">
+                <img src="images/oraple_mask.jpg" alt="Lion double blurred">
+              </a>
+              <div class="desc">Oraple Mask</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/oraple.jpg">
+                <img src="images/oraple.jpg" alt="Lion high frequencies">
+              </a>
+              <div class="desc">Oraple</div>
+            </div> 
+        </div>
+    </div>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/lp_apple0.jpg">
+              <img src="images/lp_apple0.jpg" alt="Laplacian Apple 0">
+            </a>
+            <div class="desc">Weighted Laplacian Apple (level = 0)</div>
+          </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_apple1.jpg">
+                <img src="images/lp_apple1.jpg" alt="Laplacian Apple 1">
+                </a>
+                <div class="desc">Weighted Laplacian Apple (level = 1)</div>
+            </div>
+        </div> 
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_apple2.jpg">
+                <img src="images/lp_apple2.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Apple (level = 2)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_apple3.jpg">
+                <img src="images/lp_apple3.jpg" alt="Laplacian Apple 3">
+                </a>
+                <div class="desc">Weighted Laplacian Apple (level = 3)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_apple4.jpg">
+                <img src="images/lp_apple4.jpg" alt="Laplacian Apple 4">
+                </a>
+                <div class="desc">Weighted Laplacian Apple (level = 4)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_apple5.jpg">
+                <img src="images/lp_apple5.jpg" alt="Laplacian Apple 5">
+                </a>
+                <div class="desc">Weighted Laplacian Apple (level = 5)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/lp_oraple0.jpg">
+              <img src="images/lp_oraple0.jpg" alt="Laplacian Oraple 0">
+            </a>
+            <div class="desc">Weighted Laplacian Oraple (level = 0)</div>
+          </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_oraple1.jpg">
+                <img src="images/lp_oraple1.jpg" alt="Laplacian Oraple 1">
+                </a>
+                <div class="desc">Weighted Laplacian Oraple (level = 1)</div>
+            </div>
+        </div> 
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_oraple2.jpg">
+                <img src="images/lp_oraple2.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Oraple (level = 2)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_oraple3.jpg">
+                <img src="images/lp_oraple3.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Oraple (level = 3)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_oraple4.jpg">
+                <img src="images/lp_oraple4.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Oraple (level = 4)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_oraple5.jpg">
+                <img src="images/lp_oraple5.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Oraple (level = 5)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/lp_orange0.jpg">
+              <img src="images/lp_orange0.jpg" alt="Laplacian Apple 1">
+            </a>
+            <div class="desc">Weighted Laplacian Orange (level = 0)</div>
+          </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_orange1.jpg">
+                <img src="images/lp_orange1.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Orange (level = 1)</div>
+            </div>
+        </div> 
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_orange2.jpg">
+                <img src="images/lp_orange2.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Orange (level = 2)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_orange3.jpg">
+                <img src="images/lp_orange3.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Orange (level = 3)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_orange4.jpg">
+                <img src="images/lp_orange4.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Orange (level = 4)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_orange5.jpg">
+                <img src="images/lp_orange5.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Orange (level = 5)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>2.4 Multiresolution Blending</h3>
+    <p>We also selected our own images to blend and used irregular masks during the blending process. We followed the same procedure for blending as outlined in the previous section for the oraple, except now with irregular masks. For example, here is the blending process of an image of Toothless (the dragon from "How to Train your Dragon") and an image of SF's Golden Gate Bridge</p>
+    
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/toothless.jpeg">
+              <img src="images/toothless.jpeg" alt="blurred lion">
+            </a>
+            <div class="desc">Toothless</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/golden_gate.jpg">
+                <img src="images/golden_gate.jpg" alt="Lion double blurred">
+              </a>
+              <div class="desc">Golden Gate Bridge</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/toothless_mask.jpeg">
+                <img src="images/toothless_mask.jpeg" alt="Lion double blurred">
+              </a>
+              <div class="desc">Toothless Mask</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/toothless_gate.jpg">
+                <img src="images/toothless_gate.jpg" alt="Lion high frequencies">
+              </a>
+              <div class="desc">Toothless flying over Golden Gate Bridge</div>
+            </div> 
+        </div>
+    </div>
+    
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/lp_toothless0.jpg">
+              <img src="images/lp_toothless0.jpg" alt="Laplacian Apple 0">
+            </a>
+            <div class="desc">Weighted Laplacian Toothless (level = 0)</div>
+          </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_toothless1.jpg">
+                <img src="images/lp_toothless1.jpg" alt="Laplacian Apple 1">
+                </a>
+                <div class="desc">Weighted Laplacian Toothless (level = 1)</div>
+            </div>
+        </div> 
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_toothless2.jpg">
+                <img src="images/lp_toothless2.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Toothless (level = 2)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_toothless3.jpg">
+                <img src="images/lp_toothless3.jpg" alt="Laplacian Apple 3">
+                </a>
+                <div class="desc">Weighted Laplacian Toothless (level = 3)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_toothless4.jpg">
+                <img src="images/lp_toothless4.jpg" alt="Laplacian Apple 4">
+                </a>
+                <div class="desc">Weighted Laplacian Toothless (level = 4)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_toothless5.jpg">
+                <img src="images/lp_toothless5.jpg" alt="Laplacian Apple 5">
+                </a>
+                <div class="desc">Weighted Laplacian Toothless (level = 5)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/lp_toothless_gate0.jpg">
+              <img src="images/lp_toothless_gate0.jpg" alt="Laplacian Apple 1">
+            </a>
+            <div class="desc">Weighted Laplacian Toothless Gate (level = 0)</div>
+          </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_toothless_gate1.jpg">
+                <img src="images/lp_toothless_gate1.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Toothless Gate (level = 1)</div>
+            </div>
+        </div> 
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_toothless_gate2.jpg">
+                <img src="images/lp_toothless_gate2.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Toothless Gate (level = 2)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_toothless_gate3.jpg">
+                <img src="images/lp_toothless_gate3.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Toothless Gate (level = 3)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_toothless_gate4.jpg">
+                <img src="images/lp_toothless_gate4.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Toothless Gate (level = 4)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_toothless_gate5.jpg">
+                <img src="images/lp_toothless_gate5.jpg" alt="Laplacian Apple 2">
+                </a>
+                <div class="desc">Weighted Laplacian Toothless Gate (level = 5)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/lp_gate0.jpg">
+              <img src="images/lp_gate0.jpg" alt="Laplacian Gate 0">
+            </a>
+            <div class="desc">Weighted Laplacian Gate (level = 0)</div>
+          </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_gate1.jpg">
+                <img src="images/lp_gate1.jpg" alt="Laplacian Gate 1">
+                </a>
+                <div class="desc">Weighted Laplacian Gate (level = 1)</div>
+            </div>
+        </div> 
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_gate2.jpg">
+                <img src="images/lp_gate2.jpg" alt="Laplacian Gate 2">
+                </a>
+                <div class="desc">Weighted Laplacian Gate (level = 2)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_gate3.jpg">
+                <img src="images/lp_gate3.jpg" alt="Laplacian Gate 3">
+                </a>
+                <div class="desc">Weighted Laplacian Gate (level = 3)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_gate4.jpg">
+                <img src="images/lp_gate4.jpg" alt="Laplacian Gate 4">
+                </a>
+                <div class="desc">Weighted Laplacian Gate (level = 4)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_gate5.jpg">
+                <img src="images/lp_gate5.jpg" alt="Laplacian Gate 5">
+                </a>
+                <div class="desc">Weighted Laplacian Gate (level = 5)</div>
+            </div>
+        </div>
+    </div>
+
+    <p>Here is the blending process of an image of Bill Gates walking and an image of Sather Gate at UC Berkeley. The blended image shows Bill walking in Sather Gate</p>
+    
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/bill.jpg">
+              <img src="images/bill.jpg" alt="blurred lion">
+            </a>
+            <div class="desc">Bill Gates</div>
+          </div> 
+        </div> 
+        
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/sather.jpg">
+                <img src="images/sather.jpg" alt="Lion double blurred">
+              </a>
+              <div class="desc">Sather Gate</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/bill_mask.jpg">
+                <img src="images/bill_mask.jpg" alt="Lion double blurred">
+              </a>
+              <div class="desc">Bill Gates Mask</div>
+            </div> 
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+              <a target="_blank" href="images/bill_sather.jpg">
+                <img src="images/bill_sather.jpg" alt="Lion high frequencies">
+              </a>
+              <div class="desc">Bill Gates walking through Sather Gate</div>
+            </div> 
+        </div>
+    </div>
+    
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/lp_bill0.jpg">
+              <img src="images/lp_bill0.jpg" alt="Laplacian Bill Gates 0">
+            </a>
+            <div class="desc">Weighted Laplacian Bill Gates (level = 0)</div>
+          </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_bill1.jpg">
+                <img src="images/lp_bill1.jpg" alt="Laplacian Bill Gates 1">
+                </a>
+                <div class="desc">Weighted Laplacian Bill Gates (level = 1)</div>
+            </div>
+        </div> 
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_bill2.jpg">
+                <img src="images/lp_bill2.jpg" alt="Laplacian Bill Gates 2">
+                </a>
+                <div class="desc">Weighted Laplacian Bill Gates (level = 2)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_bill3.jpg">
+                <img src="images/lp_bill3.jpg" alt="Laplacian Bill Gates 3">
+                </a>
+                <div class="desc">Weighted Laplacian Bill Gates (level = 3)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_bill4.jpg">
+                <img src="images/lp_bill4.jpg" alt="Laplacian Bill Gates 4">
+                </a>
+                <div class="desc">Weighted Laplacian Bill Gates (level = 4)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_bill5.jpg">
+                <img src="images/lp_bill5.jpg" alt="Laplacian Bill Gates 5">
+                </a>
+                <div class="desc">Weighted Laplacian Bill Gates (level = 5)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/lp_bill_sather0.jpg">
+              <img src="images/lp_bill_sather0.jpg" alt="Laplacian Bill at Sather Gate 0">
+            </a>
+            <div class="desc">Weighted Laplacian Bill at Sather Gate (level = 0)</div>
+          </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_bill_sather1.jpg">
+                <img src="images/lp_bill_sather1.jpg" alt="Laplacian Bill at Sather Gate 1">
+                </a>
+                <div class="desc">Weighted Laplacian Bill at Sather Gate (level = 1)</div>
+            </div>
+        </div> 
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_bill_sather2.jpg">
+                <img src="images/lp_bill_sather2.jpg" alt="Laplacian Bill at Sather Gate 2">
+                </a>
+                <div class="desc">Weighted Laplacian Bill at Sather Gate (level = 2)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_bill_sather3.jpg">
+                <img src="images/lp_bill_sather3.jpg" alt="Laplacian Bill at Sather Gate 3">
+                </a>
+                <div class="desc">Weighted Laplacian Bill at Sather Gate (level = 3)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_bill_sather4.jpg">
+                <img src="images/lp_bill_sather4.jpg" alt="Laplacian Bill at Sather Gate 4">
+                </a>
+                <div class="desc">Weighted Laplacian Bill at Sather Gate (level = 4)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_bill_sather5.jpg">
+                <img src="images/lp_bill_sather5.jpg" alt="Laplacian Bill at Sather Gate 5">
+                </a>
+                <div class="desc">Weighted Laplacian Bill at Sather Gate (level = 5)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class = "container">
+        <div class="responsive">
+          <div class="gallery">
+            <a target="_blank" href="images/lp_sather0.jpg">
+              <img src="images/lp_sather0.jpg" alt="Laplacian Sather Gate 0">
+            </a>
+            <div class="desc">Weighted Laplacian Sather Gate (level = 0)</div>
+          </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_sather1.jpg">
+                <img src="images/lp_sather1.jpg" alt="Laplacian Sather Gate 1">
+                </a>
+                <div class="desc">Weighted Laplacian Sather Gate (level = 1)</div>
+            </div>
+        </div> 
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_sather2.jpg">
+                <img src="images/lp_sather2.jpg" alt="Laplacian Sather Gate 2">
+                </a>
+                <div class="desc">Weighted Laplacian Sather Gate (level = 2)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_sather3.jpg">
+                <img src="images/lp_sather3.jpg" alt="Laplacian Sather Gate 3">
+                </a>
+                <div class="desc">Weighted Laplacian Sather Gate (level = 3)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_sather4.jpg">
+                <img src="images/lp_sather4.jpg" alt="Laplacian Sather Gate 4">
+                </a>
+                <div class="desc">Weighted Laplacian Sather Gate (level = 4)</div>
+            </div>
+        </div>
+
+        <div class="responsive">
+            <div class="gallery">
+                <a target="_blank" href="images/lp_sather5.jpg">
+                <img src="images/lp_sather5.jpg" alt="Laplacian Sather Gate 5">
+                </a>
+                <div class="desc">Weighted Laplacian Sather Gate (level = 5)</div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
