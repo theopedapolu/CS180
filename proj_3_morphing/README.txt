@@ -1,5 +1,4 @@
 Name: Theophilus Pedapolu
-SID: 3035826494
 Email: theopedapolu@berkeley.edu
 
 Description of code/face_morphing.ipynb:
